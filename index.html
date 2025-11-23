@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h2>Chat com Assistente iAFSC (Pinecone)</h2>
+    <h2>Chat com Assistente iAFSC (Pinecone via Cloudflare Worker)</h2>
 
     <textarea id="msg" rows="4" cols="60" placeholder="Digite sua mensagem..."></textarea><br>
     <button onclick="enviar()">Enviar</button>
@@ -9,36 +9,32 @@
     <pre id="resp"></pre>
 
     <script>
-        const API_KEY = "pcsk_47UdKu_6LUazbXmTuqzBzKuMRereEQKL4DXo17sFhW32P6Trac2nswCNbPoLbMHcMcxCPA";
-        const ASSISTANT = "iasfc";
+        // URL do seu Worker (substitua pelo seu endereço real)
+        const WORKER_URL = "https://SEU_WORKER.workers.dev";
 
         async function enviar() {
             const userMsg = document.getElementById("msg").value;
 
+            // Objeto enviado ao Worker
             const body = {
-                messages: [
-                    { role: "user", content: userMsg }
-                ],
-                stream: false,
-                model: "gemini-2.5-pro"
+                content: userMsg
             };
 
-            const response = await fetch(
-                `https://prod-1-data.ke.pinecone.io/assistant/chat/${ASSISTANT}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Api-Key": API_KEY,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(body)
-                }
-            );
+            const response = await fetch(WORKER_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
 
             const data = await response.json();
-            
-            // Exibir apenas o conteúdo
-            const content = data?.message?.content || "⚠️ Erro: conteúdo não encontrado";
+
+            // O worker devolve o JSON inteiro do Pinecone,
+            // então acessamos da forma correta:
+            const content =
+                data?.message?.content ||
+                "⚠️ Erro: conteúdo não encontrado no retorno do Worker";
 
             document.getElementById("resp").textContent = content;
         }
