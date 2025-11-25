@@ -240,6 +240,31 @@
       animation: dots 1.5s steps(4, end) infinite;
     }
 
+    /* Estilos para links clicáveis */
+    .message a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s ease;
+      word-break: break-all;
+    }
+
+    .message a:hover {
+      border-bottom: 1px solid #667eea;
+      text-decoration: none;
+    }
+
+    .message.user a {
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .message.user a:hover {
+      color: white;
+      border-bottom: 1px solid white;
+    }
+
     @keyframes dots {
       0%, 20% { content: '.'; }
       40% { content: '..'; }
@@ -371,6 +396,20 @@
       container.scrollTop = container.scrollHeight;
     }
 
+    // Função para transformar URLs em links clicáveis
+    function makeLinksClickable(text) {
+      // Regex para detectar URLs (http, https, ftp, etc)
+      const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
+      
+      return text.replace(urlRegex, function(url) {
+        // Verifica se já é um link (para não duplicar)
+        if (url.startsWith('<a ')) return url;
+        
+        // Cria o link com target="_blank" para abrir em nova aba
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+      });
+    }
+
     // Funções Principais
     async function enviar() {
         const input = document.getElementById("msg");
@@ -470,7 +509,11 @@
         const container = document.getElementById("chatContainer");
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message", type);
-        msgDiv.innerText = text;
+        
+        // Transforma URLs em links clicáveis
+        const processedText = makeLinksClickable(text);
+        msgDiv.innerHTML = processedText;
+        
         container.appendChild(msgDiv);
         container.scrollTop = container.scrollHeight;
     }
