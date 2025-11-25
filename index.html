@@ -80,6 +80,32 @@
       box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
     }
 
+    .debug-panel {
+      background: rgba(0, 0, 0, 0.7);
+      color: #00ff88;
+      padding: 10px 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      max-height: 120px;
+      overflow-y: auto;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .debug-panel.hidden {
+      display: none;
+    }
+
+    .debug-toggle {
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      margin-left: 10px;
+    }
+
     .chat-container {
       flex: 1;
       overflow-y: auto;
@@ -122,6 +148,15 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       margin-right: auto;
       border-bottom-left-radius: 6px;
+    }
+
+    .message.debug {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ff9800;
+      font-size: 0.85rem;
+      padding: 12px 20px;
+      font-family: 'Courier New', monospace;
     }
 
     .chat-input-wrapper {
@@ -273,13 +308,21 @@
         <div class="logo-icon">IA</div>
         <div class="logo-text">iAFSC - IFSC Chapecó</div>
       </div>
-      <button class="btn-limpar" onclick="limparHistorico()">
-        🗑️ Nova Conversa
-      </button>
+      <div>
+        <button class="btn-limpar" onclick="limparHistorico()">
+          🗑️ Nova Conversa
+        </button>
+        <button class="debug-toggle" onclick="toggleDebug()">🐛 Debug</button>
+      </div>
     </div>
   </div>
 
-  <div class="chat-container"></div>
+  <div class="debug-panel hidden" id="debugPanel">
+    <div><strong>DEBUG PANEL - iAFSC</strong></div>
+    <div id="debugContent"></div>
+  </div>
+
+  <div class="chat-container" id="chatContainer"></div>
 
   <div class="chat-input-wrapper">
     <div class="chat-input">
@@ -291,7 +334,44 @@
   <script>
     const WORKER_URL = "https://iafscr.davi-af26.workers.dev";
     let conversationHistory = [];
+    let debugEnabled = false;
 
+    // Funções de Debug
+    function toggleDebug() {
+      debugEnabled = !debugEnabled;
+      const debugPanel = document.getElementById('debugPanel');
+      debugPanel.classList.toggle('hidden', !debugEnabled);
+      addDebugLog(`🔧 Debug ${debugEnabled ? 'ativado' : 'desativado'}`);
+    }
+
+    function addDebugLog(message) {
+      if (!debugEnabled) return;
+      
+      const debugContent = document.getElementById('debugContent');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      debugContent.appendChild(logEntry);
+      
+      // Mantém apenas os últimos 20 logs
+      while (debugContent.children.length > 20) {
+        debugContent.removeChild(debugContent.firstChild);
+      }
+      
+      // Scroll para o final
+      debugContent.scrollTop = debugContent.scrollHeight;
+    }
+
+    function addDebugMessage(message) {
+      const container = document.getElementById('chatContainer');
+      const debugDiv = document.createElement('div');
+      debugDiv.classList.add('message', 'debug');
+      debugDiv.innerHTML = `🐛 <strong>DEBUG:</strong> ${message}`;
+      container.appendChild(debugDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Funções Principais
     async function enviar() {
         const input = document.getElementById("msg");
         const userMsg = input.value.trim();
@@ -304,13 +384,22 @@
 
         const loadingId = showLoading();
 
-        try {
-            console.log('📤 Enviando para IA...');
+        // Debug: Mostra o histórico atual
+        addDebugLog(`📤 Enviando mensagem: "${userMsg}"`);
+        addDebugLog(`📊 Histórico atual: ${conversationHistory.length} mensagens`);
+        if (conversationHistory.length > 0) {
+          addDebugLog(`📝 Últimas mensagens: ${JSON.stringify(conversationHistory.slice(-2).map(msg => 
+            `${msg.role}: ${msg.content.substring(0, 30)}...`
+          ))}`);
+        }
 
+        try {
             const body = { 
                 content: userMsg,
                 history: conversationHistory
             };
+
+            addDebugLog(`🔄 Fazendo request para Worker...`);
 
             const response = await fetch(WORKER_URL, {
                 method: "POST",
@@ -321,7 +410,13 @@
             });
 
             const data = await response.json();
-            console.log("📥 Resposta recebida:", data);
+            
+            // Debug detalhado da resposta
+            addDebugLog(`📥 Resposta recebida - Status: ${response.status}`);
+            addDebugLog(`✅ Success: ${data.success}`);
+            addDebugLog(`🔄 Synthesized: ${data.synthesized || false}`);
+            addDebugLog(`📏 Estimated Tokens: ${data.estimatedTokens || 'N/A'}`);
+            addDebugLog(`💬 Novo histórico: ${data.updatedHistory ? data.updatedHistory.length : 'N/A'} mensagens`);
 
             hideLoading(loadingId);
 
@@ -330,11 +425,25 @@
             }
 
             if (data.success && data.content) {
+                // Adiciona mensagem de debug se houve síntese
+                if (data.synthesized) {
+                    addDebugMessage("Contexto sintetizado com Groq/Llama para otimização");
+                    addDebugLog(`🎯 Contexto sintetizado! Histórico reduzido de ${conversationHistory.length} para ${data.updatedHistory.length} mensagens`);
+                }
+                
                 addMessage(data.content, "bot");
                 if (data.updatedHistory) {
                     conversationHistory = data.updatedHistory;
                 }
-                console.log(`💬 Histórico: ${conversationHistory.length} mensagens`);
+                
+                addDebugLog(`📈 Histórico atualizado: ${conversationHistory.length} mensagens`);
+                
+                // Debug do conteúdo do histórico atual
+                if (debugEnabled) {
+                  addDebugLog(`🔍 Conteúdo do histórico: ${JSON.stringify(conversationHistory.map(msg => 
+                    `${msg.role}: ${msg.content.substring(0, 50)}...`
+                  ))}`);
+                }
             } else {
                 throw new Error("Resposta inválida do servidor");
             }
@@ -342,6 +451,7 @@
         } catch (error) {
             hideLoading(loadingId);
             console.error("💥 Erro:", error);
+            addDebugLog(`❌ Erro: ${error.message}`);
 
             if (error.message.includes('serviço') || error.message.includes('indisponível')) {
                 addMessage("🔧 Estamos com problemas técnicos no momento. Tente novamente em alguns minutos.", "bot");
@@ -357,7 +467,7 @@
     }
 
     function addMessage(text, type) {
-        const container = document.querySelector(".chat-container");
+        const container = document.getElementById("chatContainer");
         const msgDiv = document.createElement("div");
         msgDiv.classList.add("message", type);
         msgDiv.innerText = text;
@@ -366,7 +476,7 @@
     }
 
     function showLoading() {
-        const container = document.querySelector(".chat-container");
+        const container = document.getElementById("chatContainer");
         const loadingDiv = document.createElement("div");
         const loadingId = "loading-" + Date.now();
         loadingDiv.id = loadingId;
@@ -389,10 +499,10 @@
 
     function limparHistorico() {
         conversationHistory = [];
-        const container = document.querySelector(".chat-container");
+        const container = document.getElementById("chatContainer");
         container.innerHTML = '';
         addMessage("🔄 Conversa reiniciada. Como posso ajudar?", "bot");
-        console.log("🧹 Histórico limpo - Nova conversa iniciada");
+        addDebugLog("🧹 Histórico limpo - Nova conversa iniciada");
         
         const input = document.getElementById("msg");
         if (input) {
@@ -417,12 +527,13 @@
             textarea.focus();
         }
         
-        const container = document.querySelector(".chat-container");
+        const container = document.getElementById("chatContainer");
         if (container && container.children.length === 0) {
             addMessage("👋 Olá! Sou o iAFSC, assistente do IFSC Câmpus Chapecó. Posso ajudar com informações sobre cursos, horários, professores e muito mais! 😊", "bot");
         }
         
-        console.log("✅ Chat inicializado - iAFSC IFSC Chapecó");
+        addDebugLog("✅ Chat inicializado - iAFSC IFSC Chapecó");
+        addDebugLog("🔧 Clique no botão 'Debug' para ver informações detalhadas");
     });
   </script>
 </body>
