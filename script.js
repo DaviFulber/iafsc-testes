@@ -129,3 +129,28 @@ document.addEventListener("DOMContentLoaded", function() {
     
     console.log("✅ Chat inicializado - Otimizado para custos");
 });
+function limparHistorico() {
+    conversationHistory = [];
+    
+    // Limpa as mensagens na tela
+    const container = document.querySelector(".chat-container");
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Adiciona mensagem de confirmação
+    addMessage("🔄 Conversa reiniciada. Como posso ajudar?", "bot");
+    
+    // Limpa cache local se existir
+    if (typeof localCache !== 'undefined') {
+        localCache.clear();
+    }
+    
+    console.log("🧹 Histórico limpo - Nova conversa iniciada");
+    
+    // Foca no input para nova mensagem
+    const input = document.getElementById("msg");
+    if (input) {
+        input.focus();
+    }
+}
