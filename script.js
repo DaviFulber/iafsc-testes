@@ -22,7 +22,6 @@ async function enviar() {
             history: conversationHistory
         };
 
-        // SEM TIMEOUT - Aguarda o tempo que for necessário
         const response = await fetch(WORKER_URL, {
             method: "POST",
             headers: { 
@@ -54,10 +53,8 @@ async function enviar() {
         hideLoading(loadingId);
         console.error("💥 Erro:", error);
 
-        // Mensagens de erro amigáveis
         if (error.message.includes('serviço') || error.message.includes('indisponível')) {
-            addMessage("🔧 Estamos com problemas técnicos no momento. " +
-                      "Tente novamente em alguns minutos.", "bot");
+            addMessage("🔧 Estamos com problemas técnicos no momento. Tente novamente em alguns minutos.", "bot");
         } else if (error.message.includes('conexão')) {
             addMessage("🌐 Erro de conexão. Verifique sua internet e tente novamente.", "bot");
         } else {
@@ -69,7 +66,6 @@ async function enviar() {
     }
 }
 
-// Funções auxiliares
 function addMessage(text, type) {
     const container = document.querySelector(".chat-container");
     const msgDiv = document.createElement("div");
@@ -109,7 +105,6 @@ function limparHistorico() {
     console.log("🧹 Histórico limpo");
 }
 
-// Eventos
 document.addEventListener("DOMContentLoaded", function() {
     const textarea = document.getElementById("msg");
     if (textarea) {
@@ -127,18 +122,10 @@ document.addEventListener("DOMContentLoaded", function() {
         textarea.focus();
     }
     
-    // Mensagem de boas-vindas
     const container = document.querySelector(".chat-container");
     if (container && container.children.length === 0) {
         addMessage("👋 Olá! Estou aqui para ajudar. Pode me fazer qualquer pergunta!", "bot");
     }
     
-    console.log("✅ Chat inicializado - Sem timeouts");
+    console.log("✅ Chat inicializado - Otimizado para custos");
 });
-
-// Função para debug
-function debugInfo() {
-    console.log("💬 Debug Info:");
-    console.log("- Histórico:", conversationHistory.length, "mensagens");
-    console.log("- Últimas:", conversationHistory.slice(-3));
-}
