@@ -533,7 +533,7 @@
 
 function formatMessage(text) {
     return text
-        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong>$1</strong>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/(https?:\/\/[^\s]+)/g, url => 
             `<a href="${url.replace(/[.,!?;:]$/, '')}" target="_blank" class="chat-link">${url}</a>`
         )
