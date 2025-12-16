@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>iAFSC - IFSC Chapecó</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     * {
@@ -336,6 +337,31 @@
 .message {
     line-height: 1.5;
 }
+.ia-container {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left; /* Garante que o texto fique alinhado à esquerda dentro do SweetAlert */
+}
+.ia-container h3 {
+  color: #007bff; /* Azul para destaque do título */
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+.ia-container h4 {
+  color: #555;
+  margin-top: 20px;
+}
+.ia-container strong {
+  color: #000;
+}
+.ia-container ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
   </style>
 </head>
 
@@ -343,8 +369,8 @@
   <div class="header">
     <div class="header-content">
       <div class="logo">
-        <div class="logo-icon">IA</div>
-        <div class="logo-text">iAFSC - IFSC Chapecó</div>
+        <div class="logo-icon" onclick="explicaIA()">IA</div>
+        <div class="logo-text">IAFSC - IFSC Chapecó</div>
       </div>
       <div>
         <button class="btn-limpar" onclick="limparHistorico()">
@@ -600,6 +626,42 @@ function formatMessage(text) {
         addDebugLog("✅ Chat inicializado - iAFSC IFSC Chapecó");
         addDebugLog("🔧 Clique no botão 'Debug' para ver informações detalhadas");
     });
+    function explicaIA(){
+      Swal.fire({
+          title: "IA",
+          html: `<div class="ia-container">
+          <h3>🤖 O que é Inteligência Artificial (IA)?</h3>
+          
+          <p>A <strong>Inteligência Artificial (IA)</strong> é um campo da ciência da computação focado na criação de <strong>sistemas ou máquinas que podem simular a inteligência humana</strong>.</p>
+          
+          <p>Em essência, a IA permite que computadores <strong>aprendam</strong>, <strong>tomem decisões</strong>, <strong>resolvam problemas</strong> e <strong>compreendam</strong> a linguagem humana.</p>
+          
+          <h4>💡 Como a IA funciona?</h4>
+          
+          <p>A base da IA moderna é o <strong>Aprendizado de Máquina (Machine Learning)</strong>. Em vez de serem explicitamente programados para cada tarefa, os algoritmos são "treinados" em grandes quantidades de dados para:</p>
+          
+          <ul>
+              <li><strong>Identificar Padrões:</strong> Processar dados (fotos, textos, números) para encontrar correlações.</li>
+              <li><strong>Tomar Decisões:</strong> Usar esses padrões para fazer previsões ou escolhas.</li>
+              <li><strong>Melhorar:</strong> Ajustar seus parâmetros a cada nova informação, tornando-se cada vez mais preciso.</li>
+          </ul>
+          
+          <h4>🌎 Onde encontramos a IA?</h4>
+          
+          <p>A IA está presente em nosso dia a dia em diversas aplicações, tais como:</p>
+          
+          <ul>
+              <li><strong>Assistentes Virtuais</strong> (Siri, Alexa).</li>
+              <li><strong>Sistemas de Recomendação</strong> (Netflix, Spotify).</li>
+              <li><strong>Carros Autônomos</strong> e sistemas de navegação avançados.</li>
+              <li><strong>Análise de dados complexos</strong> e diagnóstico médico.</li>
+          </ul>
+          
+          <p>Em resumo, a IA é a tecnologia que confere às máquinas a capacidade de <strong>raciocinar, aprender e agir</strong> de forma "inteligente" para realizar tarefas complexas.</p>
+      
+      </div>`
+        });
+  }
   </script>
 </body>
 </html>

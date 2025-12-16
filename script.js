@@ -154,3 +154,40 @@ function limparHistorico() {
         input.focus();
     }
 }
+function explicaIA(){
+    Swal.fire({
+        title: "IA",
+        html: `<div class="ia-container">
+        <h3>🤖 O que é Inteligência Artificial (IA)?</h3>
+        
+        <p>A <strong>Inteligência Artificial (IA)</strong> é um campo da ciência da computação focado na criação de <strong>sistemas ou máquinas que podem simular a inteligência humana</strong>.</p>
+        
+        <p>Em essência, a IA permite que computadores <strong>aprendam</strong>, <strong>tomem decisões</strong>, <strong>resolvam problemas</strong> e <strong>compreendam</strong> a linguagem humana.</p>
+        
+        <h4>💡 Como a IA funciona?</h4>
+        
+        <p>A base da IA moderna é o <strong>Aprendizado de Máquina (Machine Learning)</strong>. Em vez de serem explicitamente programados para cada tarefa, os algoritmos são "treinados" em grandes quantidades de dados para:</p>
+        
+        <ul>
+            <li><strong>Identificar Padrões:</strong> Processar dados (fotos, textos, números) para encontrar correlações.</li>
+            <li><strong>Tomar Decisões:</strong> Usar esses padrões para fazer previsões ou escolhas.</li>
+            <li><strong>Melhorar:</strong> Ajustar seus parâmetros a cada nova informação, tornando-se cada vez mais preciso.</li>
+        </ul>
+        
+        <h4>🌎 Onde encontramos a IA?</h4>
+        
+        <p>A IA está presente em nosso dia a dia em diversas aplicações, tais como:</p>
+        
+        <ul>
+            <li><strong>Assistentes Virtuais</strong> (Siri, Alexa).</li>
+            <li><strong>Sistemas de Recomendação</strong> (Netflix, Spotify).</li>
+            <li><strong>Carros Autônomos</strong> e sistemas de navegação avançados.</li>
+            <li><strong>Análise de dados complexos</strong> e diagnóstico médico.</li>
+        </ul>
+        
+        <p>Em resumo, a IA é a tecnologia que confere às máquinas a capacidade de <strong>raciocinar, aprender e agir</strong> de forma "inteligente" para realizar tarefas complexas.</p>
+    
+    </div>`
+      });
+}
+window.onload = explicaIA()
